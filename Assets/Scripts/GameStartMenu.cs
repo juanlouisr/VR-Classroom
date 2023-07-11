@@ -11,8 +11,8 @@ public class GameStartMenu : MonoBehaviour
     public GameObject about;
 
     [Header("Main Menu Buttons")]
-    public Button startButton;
-    public Button optionButton;
+    public Button hostButton;
+    public Button clientButton;
     public Button aboutButton;
     public Button quitButton;
 
@@ -24,8 +24,8 @@ public class GameStartMenu : MonoBehaviour
         EnableMainMenu();
 
         //Hook events
-        startButton.onClick.AddListener(StartGame);
-        optionButton.onClick.AddListener(EnableOption);
+        hostButton.onClick.AddListener(StartHost);
+        clientButton.onClick.AddListener(StartClient);
         aboutButton.onClick.AddListener(EnableAbout);
         quitButton.onClick.AddListener(QuitGame);
 
@@ -40,10 +40,16 @@ public class GameStartMenu : MonoBehaviour
         Application.Quit();
     }
 
-    public void StartGame()
+    public void StartHost()
     {
         HideAll();
-        SceneTransitionManager.singleton.GoToSceneAsync(1);
+        // SceneTransitionManager.singleton.GoToSceneAsync(1);
+    }
+
+    public void StartClient()
+    {
+        HideAll();
+        // SceneTransitionManager.singleton.GoToSceneAsync(1);
     }
 
     public void HideAll()
@@ -59,12 +65,12 @@ public class GameStartMenu : MonoBehaviour
         options.SetActive(false);
         about.SetActive(false);
     }
-    public void EnableOption()
-    {
-        mainMenu.SetActive(false);
-        options.SetActive(true);
-        about.SetActive(false);
-    }
+    // public void EnableOption()
+    // {
+    //     mainMenu.SetActive(false);
+    //     options.SetActive(true);
+    //     about.SetActive(false);
+    // }
     public void EnableAbout()
     {
         mainMenu.SetActive(false);

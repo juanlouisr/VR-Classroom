@@ -2856,7 +2856,7 @@ Transform:
   - {fileID: 613264613266368219}
   - {fileID: 8060171264544447910}
   m_Father: {fileID: 0}
-  m_RootOrder: 7
+  m_RootOrder: -1
   m_LocalEulerAnglesHint: {x: 0, y: 0, z: 0}
 --- !u!95 &2066115674143373885
 Animator:
@@ -3289,6 +3289,7 @@ MonoBehaviour:
   m_Script: {fileID: 11500000, guid: d7699a18e56c49b46a2e6e81b25a2973, type: 3}
   m_Name: 
   m_EditorClassIdentifier: 
+  isLocalPlayer: 0
 --- !u!1 &9214084761065683275
 GameObject:
   m_ObjectHideFlags: 0
