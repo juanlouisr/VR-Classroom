@@ -43,13 +43,15 @@ public class GameStartMenu : MonoBehaviour
     public void StartHost()
     {
         HideAll();
-        // SceneTransitionManager.singleton.GoToSceneAsync(1);
+        SceneTransitionManager.singleton.InitiatlizeAsHost = true;
+        SceneTransitionManager.singleton.GoToSceneAsync(1);
     }
 
     public void StartClient()
     {
         HideAll();
-        // SceneTransitionManager.singleton.GoToSceneAsync(1);
+        SceneTransitionManager.singleton.InitiatlizeAsHost = false;
+        SceneTransitionManager.singleton.GoToSceneAsync(1);
     }
 
     public void HideAll()

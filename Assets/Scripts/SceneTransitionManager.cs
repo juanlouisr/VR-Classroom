@@ -8,6 +8,8 @@ public class SceneTransitionManager : MonoBehaviour
     public FadeScreen fadeScreen;
     public static SceneTransitionManager singleton;
 
+    public bool InitiatlizeAsHost { get; set; }
+
     private void Awake()
     {
         if (singleton && singleton != this)
