@@ -273,6 +273,7 @@ namespace UnityEngine.XR.Content.Walkthrough
 
         void SetCameraPosition()
         {
+            Debug.Log("Set Camera Position");
             TeleportRequest request = new TeleportRequest()
             {
                 requestTime = Time.time,

@@ -6,7 +6,7 @@ using UnityEngine.XR.Interaction.Toolkit.Samples.StarterAssets;
 public class NetworkDynamicMoveProvider : DynamicMoveProvider
 {
     [SerializeField]
-    private bool enableInputAction;
+    public bool enableInputAction;
 
 
     protected override Vector2 ReadInput()

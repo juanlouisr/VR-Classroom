@@ -4,7 +4,7 @@ using UnityEngine.XR.Interaction.Toolkit;
 public class NetworkContinousTurnProvider : ActionBasedContinuousTurnProvider
 {
     [SerializeField]
-    private bool enableInputAction;
+    public bool enableInputAction;
 
 
     protected override Vector2 ReadInput()

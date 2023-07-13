@@ -65,6 +65,9 @@ MonoBehaviour:
   m_Move: {fileID: 6972639530819350904, guid: c348712bda248c246b8c49b3db54643f, type: 3}
   m_SmoothMotionEnabled: 1
   m_SmoothTurnEnabled: 0
+  m_ManualTeleportation: 0
+  m_TeleportProvider: {fileID: 0}
+  m_TeleportRayInteractor: {fileID: 0}
 --- !u!114 &202364692
 MonoBehaviour:
   m_ObjectHideFlags: 0
@@ -373,6 +376,9 @@ MonoBehaviour:
   m_Move: {fileID: -8198699208435500284, guid: c348712bda248c246b8c49b3db54643f, type: 3}
   m_SmoothMotionEnabled: 0
   m_SmoothTurnEnabled: 0
+  m_ManualTeleportation: 0
+  m_TeleportProvider: {fileID: 0}
+  m_TeleportRayInteractor: {fileID: 0}
 --- !u!114 &1670256628
 MonoBehaviour:
   m_ObjectHideFlags: 0

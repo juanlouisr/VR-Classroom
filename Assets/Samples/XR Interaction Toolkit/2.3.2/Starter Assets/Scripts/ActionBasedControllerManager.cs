@@ -74,6 +74,16 @@ namespace UnityEngine.XR.Interaction.Toolkit.Samples.StarterAssets
         [Tooltip("If true, continuous turn will be enabled. If false, snap turn will be enabled. Note: If smooth motion is enabled and enable strafe is enabled on the continuous move provider, turn will be overriden in favor of strafe.")]
         bool m_SmoothTurnEnabled;
 
+
+        [SerializeField]
+        bool m_ManualTeleportation;
+
+        [SerializeField]
+        TeleportationProvider m_TeleportProvider;
+
+        [SerializeField]
+        XRRayInteractor m_TeleportRayInteractor;
+
         public bool smoothMotionEnabled
         {
             get => m_SmoothMotionEnabled;
@@ -153,6 +163,8 @@ namespace UnityEngine.XR.Interaction.Toolkit.Samples.StarterAssets
         {
             m_Teleporting = true;
 
+            Debug.Log("teleporting");
+
             if (m_TeleportInteractor != null)
                 m_TeleportInteractor.gameObject.SetActive(true);
 
@@ -162,6 +174,7 @@ namespace UnityEngine.XR.Interaction.Toolkit.Samples.StarterAssets
         void OnCancelTeleport(InputAction.CallbackContext context)
         {
             m_Teleporting = false;
+            Debug.Log("Teleport Cancelled/Finished");
 
             // Do not deactivate the teleport interactor in this callback.
             // We delay turning off the teleport interactor in this callback so that
@@ -201,6 +214,7 @@ namespace UnityEngine.XR.Interaction.Toolkit.Samples.StarterAssets
 
         protected void OnEnable()
         {
+            Debug.Log("Enable");
             if (m_TeleportInteractor != null)
                 m_TeleportInteractor.gameObject.SetActive(false);
 
@@ -336,5 +350,36 @@ namespace UnityEngine.XR.Interaction.Toolkit.Samples.StarterAssets
             return actionReference != null ? actionReference.action : null;
 #pragma warning restore IDE0031
         }
+
+        void Update()
+        {
+            if (!m_ManualTeleportation || !m_Teleporting)
+                return;
+            
+            Debug.Log(GetInputAction(m_Move).ReadValue<Vector2>());
+
+            if (GetInputAction(m_Move).ReadValue<Vector2>() != Vector2.zero)
+                return;
+
+            if (!m_TeleportRayInteractor.TryGetCurrent3DRaycastHit(out RaycastHit hit))
+            {
+                return; 
+            }
+
+            TeleportRequest request = new TeleportRequest()
+            {
+                // requestTime = Time.time,
+                // matchOrientation = MatchOrientation.TargetUpAndForward,
+                destinationPosition = hit.point
+            };
+
+            m_TeleportProvider.QueueTeleportRequest(request);
+            // m_Teleporting = false;
+            // RayInteractorUpdate();
+        
+            
+        }
+
+
     }
 }
