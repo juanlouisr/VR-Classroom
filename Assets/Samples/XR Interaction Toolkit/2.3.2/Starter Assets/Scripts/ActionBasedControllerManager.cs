@@ -173,8 +173,22 @@ namespace UnityEngine.XR.Interaction.Toolkit.Samples.StarterAssets
 
         void OnCancelTeleport(InputAction.CallbackContext context)
         {
-            m_Teleporting = false;
+
+            if (!m_TeleportRayInteractor.TryGetCurrent3DRaycastHit(out RaycastHit hit))
+            {
+                return; 
+            }
+
+            TeleportRequest request = new TeleportRequest()
+            {
+                destinationPosition = hit.point
+            };
+
+            m_TeleportProvider.QueueTeleportRequest(request);
+
             Debug.Log("Teleport Cancelled/Finished");
+
+            m_Teleporting = false;
 
             // Do not deactivate the teleport interactor in this callback.
             // We delay turning off the teleport interactor in this callback so that
@@ -356,28 +370,10 @@ namespace UnityEngine.XR.Interaction.Toolkit.Samples.StarterAssets
             if (!m_ManualTeleportation || !m_Teleporting)
                 return;
             
-            Debug.Log(GetInputAction(m_Move).ReadValue<Vector2>());
 
-            if (GetInputAction(m_Move).ReadValue<Vector2>() != Vector2.zero)
+            if (GetInputAction(m_TeleportModeActivate).inProgress)
                 return;
-
-            if (!m_TeleportRayInteractor.TryGetCurrent3DRaycastHit(out RaycastHit hit))
-            {
-                return; 
-            }
-
-            TeleportRequest request = new TeleportRequest()
-            {
-                // requestTime = Time.time,
-                // matchOrientation = MatchOrientation.TargetUpAndForward,
-                destinationPosition = hit.point
-            };
-
-            m_TeleportProvider.QueueTeleportRequest(request);
-            // m_Teleporting = false;
-            // RayInteractorUpdate();
         
-            
         }
 
 
