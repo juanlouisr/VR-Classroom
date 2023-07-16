@@ -173,21 +173,20 @@ namespace UnityEngine.XR.Interaction.Toolkit.Samples.StarterAssets
 
         void OnCancelTeleport(InputAction.CallbackContext context)
         {
-
-            if (!m_TeleportRayInteractor.TryGetCurrent3DRaycastHit(out RaycastHit hit))
+            if (m_ManualTeleportation)
             {
-                return; 
+                if (m_TeleportRayInteractor.TryGetCurrent3DRaycastHit(out RaycastHit hit))
+                {
+                    TeleportRequest request = new TeleportRequest()
+                    {
+                        destinationPosition = hit.point
+                    };
+
+                    m_TeleportProvider.QueueTeleportRequest(request);
+                }
             }
 
-            TeleportRequest request = new TeleportRequest()
-            {
-                destinationPosition = hit.point
-            };
-
-            m_TeleportProvider.QueueTeleportRequest(request);
-
             Debug.Log("Teleport Cancelled/Finished");
-
             m_Teleporting = false;
 
             // Do not deactivate the teleport interactor in this callback.
@@ -363,17 +362,6 @@ namespace UnityEngine.XR.Interaction.Toolkit.Samples.StarterAssets
 #pragma warning disable IDE0031 // Use null propagation -- Do not use for UnityEngine.Object types
             return actionReference != null ? actionReference.action : null;
 #pragma warning restore IDE0031
-        }
-
-        void Update()
-        {
-            if (!m_ManualTeleportation || !m_Teleporting)
-                return;
-            
-
-            if (GetInputAction(m_TeleportModeActivate).inProgress)
-                return;
-        
         }
 
 
