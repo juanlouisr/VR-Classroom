@@ -8,11 +8,23 @@ using UnityEngine.XR.Interaction.Toolkit.Samples.StarterAssets;
 
 public class NetworkPlayer : NetworkBehaviour
 {
-    // Start is called before the first frame update
+// Start is called before the first frame update
+    [SerializeField]
+    XRRayInteractor[] m_RayInteractors;
+    
     public override void OnNetworkSpawn()
     {
         DisableClientInput();
+        RegisterNetworkGrabbable();
+        base.OnNetworkSpawn();
     }
+
+    public override void OnNetworkDespawn()
+    {
+        UnregisterNetworkGrabbable();
+        base.OnNetworkDespawn();
+    }
+
 
     private void DisableClientInput()
     {
@@ -48,6 +60,49 @@ public class NetworkPlayer : NetworkBehaviour
             {
                 controllerManager.enabled = false;
             }
+        }
+    }
+
+    private void RegisterNetworkGrabbable()
+    {
+        foreach (var m_RayInteractor in  m_RayInteractors) 
+        {
+            m_RayInteractor.selectEntered.AddListener(OnSelectGrabbable);
+        }
+    }
+
+    private void UnregisterNetworkGrabbable()
+    {
+        foreach (var m_RayInteractor in m_RayInteractors)
+        {
+            m_RayInteractor.selectEntered.RemoveListener(OnSelectGrabbable);
+        }
+    }
+
+    public void OnSelectGrabbable(SelectEnterEventArgs eventArgs)
+    {
+        if (IsClient && IsOwner)
+        {
+            Debug.Log("Select Grabbable Event");
+            var selectedNetworkObj = eventArgs.interactableObject.transform.GetComponent<NetworkObject>();
+
+            if (selectedNetworkObj != null)
+            {
+                RequestGrabbableOwnershipServerRpc(OwnerClientId, selectedNetworkObj);
+            }
+        }
+    }
+
+    [ServerRpc]
+    public void RequestGrabbableOwnershipServerRpc(ulong networkClientId, NetworkObjectReference networkObjectReference)
+    {
+        if (networkObjectReference.TryGet(out NetworkObject networkObject))
+        {
+            networkObject.ChangeOwnership(networkClientId);
+        }
+        else
+        {
+            Debug.Log($"Unable to change ownership for clietnId {networkClientId}");
         }
     }
 }
