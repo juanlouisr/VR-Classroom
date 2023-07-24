@@ -4053,6 +4053,9 @@ MonoBehaviour:
   m_Script: {fileID: 11500000, guid: 9e75fc9d62710fc4b8535fd0c2f1c784, type: 3}
   m_Name: 
   m_EditorClassIdentifier: 
+  m_RayInteractors:
+  - {fileID: 5114765350974593548}
+  - {fileID: 4658839884027601213}
 --- !u!114 &1476043030548530289
 MonoBehaviour:
   m_ObjectHideFlags: 0
