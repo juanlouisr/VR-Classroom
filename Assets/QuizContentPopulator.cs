@@ -6,34 +6,40 @@ using Quiz.Request;
 using Quiz.Response;
 using UnityEngine;
 using UnityEngine.UI;
+using TMPro;
 
 
 public class QuizContentPopulator : MonoBehaviour
 {
 
     [SerializeField]
-    GameObject header;
+    private GameObject header;
 
     [SerializeField]
-    GameObject content;
+    private GameObject content;
 
-    QuizAPIOutbond quizAPIOutbond;
+    [SerializeField]
+    private GameObject buttonGroup;
 
-    Button[] buttons;
+    [SerializeField]
+    private TMP_Text quizTitleField;
 
-    ToggleGroup toggleGroup;
+    private QuizAPIOutbond quizAPIOutbond;
 
-    private int questionIdx = 0;
+    private Button[] buttons;
+
+    private ToggleGroup toggleGroup;
+
+    public int questionIdx = 0;
 
     void Start()
     {
         quizAPIOutbond = GetComponent<QuizAPIOutbond>();
         buttons = content.GetComponentsInChildren<Button>();
         toggleGroup = content.GetComponent<ToggleGroup>();
-        quizAPIOutbond.OnQuizDataLoaded += PopulateData;
         buttons[0].onClick.AddListener(HandlePrv);
         buttons[1].onClick.AddListener(HandleNext);
-
+        quizAPIOutbond.OnQuizDataLoaded += PopulateData;
     }
 
     void OnDestroy()
@@ -46,85 +52,100 @@ public class QuizContentPopulator : MonoBehaviour
     }
 
 
-    void PopulateData(object quizData, EventArgs e)
+    void PopulateData(object sender, EventArgs e)
     {
-        Text headerText = header.GetComponent<Text>();  
-        // Debug.Log("Populate dataa " +  (headerText.text == null ? "null":"exist"));
-        headerText.text = quizAPIOutbond.quizData.quizName;
-        GenerateContent(quizAPIOutbond.quizData, 0);
-       
+        quizTitleField.text = quizAPIOutbond.quizData.quizName;
+        PopulateQuestions(quizAPIOutbond.quizData, 0);
     }
 
-    void GenerateContent(QuizDto quizDto, int questionIdx) 
+    void PopulateQuestions(QuizDto quizDto, int questionIdx)
     {
-        Debug.Log("Generating content");
         buttons[0].transform.gameObject.SetActive(false);
         buttons[1].transform.gameObject.SetActive(false);
 
-        if (questionIdx < 0)
+        if (questionIdx < 0 || questionIdx >= quizDto.questions.Length)
         {
             return;
+        }
+
+        header.GetComponent<TMP_Text>().text = quizDto.questions[questionIdx].questionText;
+
+        if (questionIdx == quizDto.questions.Length - 1)
+        {
+            buttons[1].GetComponentInChildren<TMP_Text>().text = "Submit";
+        }
+        else
+        {
+            buttons[1].GetComponentInChildren<TMP_Text>().text = "Next";
+        }
+
+        PopulateOptions(quizDto, questionIdx);
+
+        if (questionIdx > 0)
+        {
+            buttons[0].transform.gameObject.SetActive(true);
         }
         buttons[1].transform.gameObject.SetActive(true);
-        if (questionIdx >= quizDto.questions.Length)
-        {
-            return;
-        }
-        if (questionIdx == quizAPIOutbond.quizData.questions.Length-1)
-        {
-            buttons[1].GetComponentInChildren<Text>().text = "Submit";
-        }
-        buttons[0].transform.gameObject.SetActive(true);
+        
+    }
 
-
+    private void PopulateOptions(QuizDto quizDto, int questionIdx)
+    {
         GameObject optionTemplate = content.transform.GetChild(0).gameObject;
         GameObject g;
 
         List<GameObject> options = new List<GameObject>();
-        for (int i = 0; i < content.transform.childCount-1; i++)
+        foreach (Toggle toggle in content.GetComponentsInChildren<Toggle>())
         {
-            options.Add(content.transform.GetChild(i).gameObject);
+            GameObject toggleParent = toggle.transform.parent.gameObject;
+            options.Add(toggleParent);
         }
 
         foreach (var option in quizDto.questions[questionIdx].options)
         {
             g = Instantiate(optionTemplate, content.transform);
-            g.transform.GetChild(0).GetComponent<Text>().text = option.optionText;
-            OptionIndex optionIndex = g.AddComponent<OptionIndex>();
-            optionIndex.data = option.id;
+            g.transform.GetChild(0).GetComponent<TMP_Text>().text = option.optionText;
+            g.GetComponent<OptionIndex>().data = option.id;
+
+            var questionId = quizDto.questions[questionIdx].id;
+            if (quizAPIOutbond.savedAnswer.TryGetValue(questionId, out long savedAnswer) && savedAnswer == option.id) 
+            {
+                g.GetComponentInChildren<Toggle>().isOn = true;
+            }
         }
+
+        buttonGroup.transform.SetAsLastSibling();
 
         foreach (var option in options)
         {
             Destroy(option);
         }
-
-        
-         content.GetComponent<ToggleGroup>().SetAllTogglesOff();
     }
 
     private void HandleNext()
     {
-        if (questionIdx < quizAPIOutbond.quizData.questions.Length-1)
-        {
-            GenerateContent(quizAPIOutbond.quizData, ++questionIdx);
-        }
-
-
-        var toggles = toggleGroup.ActiveToggles().Where(toggle => toggle.isOn);
+        
+        var toggles = content.GetComponentsInChildren<Toggle>().Where(toggle => toggle.isOn);
         
         foreach (var toggle in toggles)
         {
-            var optionId = toggle.transform.GetComponentInParent<OptionIndex>();
-            StartCoroutine(quizAPIOutbond.SubmitQuestionOption(1, questionIdx, optionId.data));
-        }        
+            var questionid = quizAPIOutbond.quizData.questions[questionIdx].id;
+            var optionId = toggle.transform.GetComponentInParent<OptionIndex>().data;
+            quizAPIOutbond.savedAnswer[questionid] = optionId;
+            StartCoroutine(quizAPIOutbond.SubmitQuestionOption(1, questionid, optionId));
+        } 
+
+        if (questionIdx < quizAPIOutbond.quizData.questions.Length-1)
+        {
+            PopulateQuestions(quizAPIOutbond.quizData, ++questionIdx);
+        }
         
     
     }
 
     private void HandlePrv()
     {
-        GenerateContent(quizAPIOutbond.quizData, --questionIdx);
+        PopulateQuestions(quizAPIOutbond.quizData, --questionIdx);
     }
 
 

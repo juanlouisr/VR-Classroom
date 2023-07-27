@@ -12,6 +12,7 @@ public class QuizAPIOutbond : MonoBehaviour
 
     public QuizDto quizData;
 
+    public Dictionary<long, long> savedAnswer;
     public delegate void QuizDataLoadedEventHandler(object sender, EventArgs e);
 
     // Define the event using the delegate
@@ -30,6 +31,7 @@ public class QuizAPIOutbond : MonoBehaviour
     public IEnumerator GetQuizData(long quizId)
     {
         quizData = null;
+        savedAnswer = null;
 
         UnityWebRequest request = UnityWebRequest.Get(apiUrl + quizId);
         yield return request.SendWebRequest();
@@ -51,6 +53,7 @@ public class QuizAPIOutbond : MonoBehaviour
             if (responseData.success)
             {
                 quizData = responseData.data;
+                savedAnswer = new Dictionary<long, long>();
                 Debug.Log("Quiz Name: " + quizData.quizName);
                 QuizDataFetched(quizData, EventArgs.Empty);
             }
@@ -75,25 +78,23 @@ public class QuizAPIOutbond : MonoBehaviour
             questionId = questionId,
             optionId = optionId
         };
-
         string jsonData = JsonUtility.ToJson(requestData);
-        UnityWebRequest request = new UnityWebRequest(apiUrl + "/answer", "POST");
-        request.SetRequestHeader("Content-Type", "application/json");
-
-
-        byte[] postData = System.Text.Encoding.UTF8.GetBytes(jsonData);
-        request.uploadHandler = new UploadHandlerRaw(postData);
-
-        yield return request.SendWebRequest();
-
-        if (request.result != UnityWebRequest.Result.Success)
+        Debug.Log(jsonData);
+        using (UnityWebRequest request = UnityWebRequest.Post(apiUrl + "answer", jsonData, "application/json"))
         {
-            Debug.LogError("POST request failed: " + request.error);
+            yield return request.SendWebRequest();
+
+            if (request.result != UnityWebRequest.Result.Success)
+            {
+                Debug.LogError("POST request failed: " + request.error);
+            }
+            else
+            {
+                string jsonResult = request.downloadHandler.text;
+                Debug.Log(jsonResult);
+            }
         }
-        else
-        {
-            Debug.Log("Response: " + request.downloadHandler.text);
-        }
+        
     }
 
 }
