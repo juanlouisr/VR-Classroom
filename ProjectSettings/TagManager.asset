@@ -9,6 +9,7 @@ TagManager:
   - Water
   - Destroyer
   - Whiteboard
+  - UIContent
   layers:
   - Default
   - TransparentFX
