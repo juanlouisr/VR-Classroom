@@ -10,4 +10,11 @@ namespace Quiz.Request
         public long questionId;
         public long optionId;
     }
+
+    [Serializable]
+    public class FinalizeResponseRequest
+    {
+        public long userId;
+        public long quizId;
+    }
 }

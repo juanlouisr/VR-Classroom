@@ -24,6 +24,10 @@ public class QuizContentPopulator : MonoBehaviour
     [SerializeField]
     private TMP_Text quizTitleField;
 
+    [SerializeField]
+    private GameObject submitModal;
+
+
     private QuizAPIOutbond quizAPIOutbond;
 
     private Button[] buttons;
@@ -49,6 +53,11 @@ public class QuizContentPopulator : MonoBehaviour
         {
             quizAPIOutbond.OnQuizDataLoaded -= PopulateData;
         }
+    }
+
+    void OnDisable()
+    {
+        quizTitleField.text = "";
     }
 
 
@@ -131,13 +140,20 @@ public class QuizContentPopulator : MonoBehaviour
         {
             var questionid = quizAPIOutbond.quizData.questions[questionIdx].id;
             var optionId = toggle.transform.GetComponentInParent<OptionIndex>().data;
-            quizAPIOutbond.savedAnswer[questionid] = optionId;
-            StartCoroutine(quizAPIOutbond.SubmitQuestionOption(1, questionid, optionId));
+
+            if (!quizAPIOutbond.savedAnswer.ContainsKey(questionid) || quizAPIOutbond.savedAnswer[questionid] != optionId)
+            {
+                quizAPIOutbond.SubmitQuestion(questionid, optionId);
+            }
         } 
 
         if (questionIdx < quizAPIOutbond.quizData.questions.Length-1)
         {
             PopulateQuestions(quizAPIOutbond.quizData, ++questionIdx);
+        }
+        else
+        {
+            submitModal.SetActive(true);
         }
         
     
