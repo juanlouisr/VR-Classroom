@@ -27,6 +27,10 @@ public class QuizTokenModalManager : MonoBehaviour
         button.onClick.AddListener(HandleDecrypt);
         inputField.onSubmit.AddListener(x => HandleDecrypt());
     }
+    void OnDestroy()
+    {
+        quizTokenOutbound.OnTokenValid -= TokenValidEventHandler;
+    }
 
     private void HandleDecrypt()
     {
@@ -44,4 +48,6 @@ public class QuizTokenModalManager : MonoBehaviour
         gameObject.SetActive(false);
         quizPanel.SetActive(true);
     }
+
+    
 }
