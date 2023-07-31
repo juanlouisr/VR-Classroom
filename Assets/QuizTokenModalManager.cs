@@ -24,13 +24,16 @@ public class QuizTokenModalManager : MonoBehaviour
         inputField = GetComponentInChildren<TMP_InputField>();
         quizTokenOutbound = GetComponent<QuizTokenOutbound>();
         quizTokenOutbound.OnTokenValid += TokenValidEventHandler;
-        button.onClick.AddListener(HandleButtonClick);
-        inputField.onSubmit.AddListener(data => quizTokenOutbound.DecryptToken(data));
+        button.onClick.AddListener(HandleDecrypt);
+        inputField.onSubmit.AddListener(x => HandleDecrypt());
     }
 
-    private void HandleButtonClick()
+    private void HandleDecrypt()
     {
-        quizTokenOutbound.DecryptToken(inputField.text);
+        if (inputField.text != "")
+        {
+            quizTokenOutbound.DecryptToken(inputField.text);
+        }
     }
 
     void TokenValidEventHandler(long userId, long quizId)
