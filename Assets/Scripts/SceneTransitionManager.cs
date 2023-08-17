@@ -9,6 +9,7 @@ public class SceneTransitionManager : MonoBehaviour
     public static SceneTransitionManager singleton;
 
     public bool InitiatlizeAsHost { get; set; }
+    public string JoinCode { get; set; }
 
     private void Awake()
     {

@@ -8,6 +8,7 @@ public class GameStartMenu : MonoBehaviour
     [Header("UI Pages")]
     public GameObject mainMenu;
     public GameObject options;
+    public GameObject clientMenu;
     public GameObject about;
 
     [Header("Main Menu Buttons")]
@@ -50,8 +51,7 @@ public class GameStartMenu : MonoBehaviour
     public void StartClient()
     {
         HideAll();
-        SceneTransitionManager.singleton.InitiatlizeAsHost = false;
-        SceneTransitionManager.singleton.GoToSceneAsync(1);
+        EnableClientMenu();
     }
 
     public void HideAll()
@@ -59,6 +59,7 @@ public class GameStartMenu : MonoBehaviour
         mainMenu.SetActive(false);
         options.SetActive(false);
         about.SetActive(false);
+        clientMenu.SetActive(false);
     }
 
     public void EnableMainMenu()
@@ -66,17 +67,20 @@ public class GameStartMenu : MonoBehaviour
         mainMenu.SetActive(true);
         options.SetActive(false);
         about.SetActive(false);
+        clientMenu.SetActive(false);
     }
-    // public void EnableOption()
-    // {
-    //     mainMenu.SetActive(false);
-    //     options.SetActive(true);
-    //     about.SetActive(false);
-    // }
+    public void EnableClientMenu()
+    {
+        mainMenu.SetActive(false);
+        options.SetActive(false);
+        about.SetActive(false);
+        clientMenu.SetActive(true);
+    }
     public void EnableAbout()
     {
         mainMenu.SetActive(false);
         options.SetActive(false);
         about.SetActive(true);
+        clientMenu.SetActive(false);
     }
 }

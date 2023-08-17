@@ -15,6 +15,10 @@ public class QuizTokenOutbound : MonoBehaviour
 
     public event QuizIdentityLoaded OnTokenValid;
 
+    public delegate void OutboundError(string error);
+
+    public event OutboundError OnOutboundError;
+
     public void DecryptToken(string data)
     {
         Debug.Log("decrypting token " + data);
@@ -33,6 +37,7 @@ public class QuizTokenOutbound : MonoBehaviour
         if (questionCountRequest.result != UnityWebRequest.Result.Success)
         {
             Debug.LogError("Error: " + questionCountRequest.error);
+            OnOutboundError?.Invoke(questionCountRequest.error);  
         }
         else
         {
@@ -47,6 +52,7 @@ public class QuizTokenOutbound : MonoBehaviour
             }
             else
             {
+                OnOutboundError?.Invoke(responseData.error);
                 Debug.LogError("API Error: " + responseData.error);
             }
         }
