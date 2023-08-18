@@ -18,6 +18,9 @@ public class RelayManager : MonoBehaviour
     // [SerializeField]
     // private string environment = "production";
 
+    public delegate void RoomJoinEventHandler(string joinCode);
+    public event RoomJoinEventHandler OnRoomJoined;
+
     [SerializeField]
     private int maxNumberOfConnections = 10;
 
@@ -66,6 +69,7 @@ public class RelayManager : MonoBehaviour
                 relayHostData.Key, relayHostData.ConnectionData);
 
         Debug.Log($"Relay Server Generated Join Code: {relayHostData.JoinCode}");
+        OnRoomJoined?.Invoke(relayHostData.JoinCode);
 
         return relayHostData;
     }
