@@ -21,7 +21,7 @@ public class QuizAPIOutbond : MonoBehaviour
     public Dictionary<long, long> savedAnswer;
 
     public delegate void QuizDataLoadedEventHandler(object sender, EventArgs e);
-    public delegate void ScoreDataLoadedEventHandler(long score, long question);
+    public delegate void ScoreDataLoadedEventHandler(long score);
 
     // Define the event using the delegate
     public event QuizDataLoadedEventHandler OnQuizDataLoaded;
@@ -58,6 +58,10 @@ public class QuizAPIOutbond : MonoBehaviour
     public void FinalizeQuiz() 
     {
         StartCoroutine(FinalizeQuizAnswer());
+    }
+    public void GetScore() 
+    {
+        StartCoroutine(GetQuizScore());
     }
 
     public IEnumerator GetQuizData()
@@ -136,46 +140,16 @@ public class QuizAPIOutbond : MonoBehaviour
     }
 
     public IEnumerator GetQuizScore()
-    { 
-        var scoreUri = new UriBuilder(apiUrl + "/score");
-        scoreUri.Query = $"userId={userId}&quizId={quizId}";
-
-        var questionCountUri = new UriBuilder(apiUrl + "/question-count");
-        questionCountUri.Query = $"quizId={quizId}";
-        
+    {
+        var scoreUri = new UriBuilder(apiUrl + "/score")
+        {
+            Query = $"userId={userId}&quizId={quizId}"
+        };
         var scoreRequest = UnityWebRequest.Get(scoreUri.ToString());
-        var questionCountRequest = UnityWebRequest.Get(questionCountUri.ToString());
-
+        Debug.Log("getting score");
         var op1 = scoreRequest.SendWebRequest();
-        var op2 = questionCountRequest.SendWebRequest();
-
-        long questionCount = 0;
-        long score = 0;
-
-        yield return new WaitUntil(() => op1.isDone && op2.isDone);
-
-        if (questionCountRequest.result != UnityWebRequest.Result.Success)
-        {
-            Debug.LogError("Error: " + questionCountRequest.error);
-        }
-        else
-        {
-            string jsonResult = questionCountRequest.downloadHandler.text;
-
-            Debug.Log(jsonResult);
-            BaseResponse<long> responseData = JsonUtility.FromJson<BaseResponse<long>>(jsonResult);
-
-            if (responseData.success)
-            {
-                questionCount = responseData.data;
-            }
-            else
-            {
-                Debug.LogError("API Error: " + responseData.error);
-            }
-            
-        }
-
+        yield return new WaitUntil(() => op1.isDone);
+        
         if (scoreRequest.result != UnityWebRequest.Result.Success)
         {
             Debug.LogError("Error: " + scoreRequest.error);
@@ -189,8 +163,9 @@ public class QuizAPIOutbond : MonoBehaviour
 
             if (responseData.success)
             {
-                score = responseData.data;
-                OnScoreDataLoaded?.Invoke(score, questionCount);
+                long score = responseData.data;
+                Debug.Log("Success, score: " + score);
+                OnScoreDataLoaded?.Invoke(score);
             }
             else
             {

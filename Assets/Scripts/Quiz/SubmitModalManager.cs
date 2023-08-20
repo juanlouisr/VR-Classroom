@@ -10,6 +10,9 @@ public class SubmitModalManager : MonoBehaviour
     private GameObject quizSpatialPanel;
 
     [SerializeField]
+    private GameObject quizScorePanel;
+
+    [SerializeField]
     private QuizAPIOutbond quizAPIOutbond;
 
     [SerializeField]
@@ -32,12 +35,10 @@ public class SubmitModalManager : MonoBehaviour
     private void HandleConfirm()
     {
         quizAPIOutbond.FinalizeQuiz();
+        quizAPIOutbond.GetScore();
         gameObject.SetActive(false);
-    }
-
-    void OnDisable()
-    {
-        quizSpatialPanel.SetActive(false);
+        quizScorePanel.SetActive(true);
+        // quizSpatialPanel.SetActive(false);
     }
 
 }
