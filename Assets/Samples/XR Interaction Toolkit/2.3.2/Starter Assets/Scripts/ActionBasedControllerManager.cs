@@ -46,6 +46,11 @@ namespace UnityEngine.XR.Interaction.Toolkit.Samples.StarterAssets
         [SerializeField]
         [Tooltip("The reference to the action to start the teleport aiming mode for this controller.")]
         InputActionReference m_TeleportModeActivate;
+        
+
+        [SerializeField]
+        [Tooltip("The reference to the action to start the teleport.")]
+        InputActionReference m_TeleportModeStart;
 
         [SerializeField]
         [Tooltip("The reference to the action to cancel the teleport aiming mode for this controller.")]
@@ -105,6 +110,7 @@ namespace UnityEngine.XR.Interaction.Toolkit.Samples.StarterAssets
         }
 
         bool m_Teleporting;
+        bool m_TeleportButtonPressed;
 
         /// <summary>
         /// Temporary scratch list to populate with the group members of the interaction group.
@@ -130,6 +136,13 @@ namespace UnityEngine.XR.Interaction.Toolkit.Samples.StarterAssets
                 teleportModeActivateAction.canceled += OnCancelTeleport;
             }
 
+            var teleportModeStartAction = GetInputAction(m_TeleportModeStart);
+            if (teleportModeStartAction != null)
+            {
+                Debug.Log("REGISTERED action");
+                teleportModeStartAction.canceled += StartTeleportation;
+            }
+
             var teleportModeCancelAction = GetInputAction(m_TeleportModeCancel);
             if (teleportModeCancelAction != null)
             {
@@ -152,6 +165,12 @@ namespace UnityEngine.XR.Interaction.Toolkit.Samples.StarterAssets
                 teleportModeActivateAction.canceled -= OnCancelTeleport;
             }
 
+            var teleportModeStartAction = GetInputAction(m_TeleportModeStart);
+            if (teleportModeStartAction != null)
+            {
+                teleportModeStartAction.canceled -= StartTeleportation;
+            }
+
             var teleportModeCancelAction = GetInputAction(m_TeleportModeCancel);
             if (teleportModeCancelAction != null)
             {
@@ -171,7 +190,20 @@ namespace UnityEngine.XR.Interaction.Toolkit.Samples.StarterAssets
 
         void OnCancelTeleport(InputAction.CallbackContext context)
         {
-            if (m_ManualTeleportation)
+            m_Teleporting = false;
+
+            // Do not deactivate the teleport interactor in this callback.
+            // We delay turning off the teleport interactor in this callback so that
+            // the teleport interactor has a chance to complete the teleport if needed.
+            // OnAfterInteractionEvents will handle deactivating its GameObject.
+
+            RayInteractorUpdate();
+        }
+
+        void StartTeleportation(InputAction.CallbackContext context)
+        {
+            Debug.Log("Start Teleportation");
+            if (m_Teleporting && m_ManualTeleportation)
             {
                 if (m_TeleportRayInteractor.TryGetCurrent3DRaycastHit(out RaycastHit hit))
                 {
@@ -183,15 +215,6 @@ namespace UnityEngine.XR.Interaction.Toolkit.Samples.StarterAssets
                     m_TeleportProvider.QueueTeleportRequest(request);
                 }
             }
-
-            m_Teleporting = false;
-
-            // Do not deactivate the teleport interactor in this callback.
-            // We delay turning off the teleport interactor in this callback so that
-            // the teleport interactor has a chance to complete the teleport if needed.
-            // OnAfterInteractionEvents will handle deactivating its GameObject.
-
-            RayInteractorUpdate();
         }
 
         void RayInteractorUpdate()
