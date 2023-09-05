@@ -1,38 +1,55 @@
+using System;
 using System.Collections;
 using System.Collections.Generic;
+using Microsoft.MixedReality.Toolkit.Experimental.UI;
 using TMPro;
 using UnityEngine;
 
 public class SystemKeyboardManager : MonoBehaviour
 {
 
-    private TouchScreenKeyboard keyboard;
-
     private TMP_InputField inputField;
+
+    private float distance = -0.5f;
+
+    private float verticalOffset = -0.5f;
+
+    private new Transform transform;
 
 
     // Start is called before the first frame update
-    void Start()
+     void Start()
     {
-#if UNITY_ANDROID
         inputField = GetComponent<TMP_InputField>();
-        inputField.onSelect.AddListener(initial => OpenSystemKeyboard(initial));
-#endif
+        inputField.onSelect.AddListener(_ => OpenKeyboard());
+        NonNativeKeyboard.Instance.OnClosed += UnlinkInputField;
+        transform = inputField.transform;
     }
 
-    // Update is called once per frame
-    void Update()
+    private void OpenKeyboard()
     {
-        if (keyboard != null)
+        NonNativeKeyboard.Instance.InputField = inputField;
+        NonNativeKeyboard.Instance.PresentKeyboard(inputField.text);
+
+        Vector3 direction = transform.forward;
+        direction.y = 0;
+        direction.Normalize();
+
+        Vector3 targetPosition = transform.position + direction * distance + Vector3.up * verticalOffset;
+        NonNativeKeyboard.Instance.RepositionKeyboard(targetPosition);
+    }
+
+    private void UnlinkInputField(object sender, EventArgs e)
+    {
+        NonNativeKeyboard.Instance.InputField = null;
+    }
+
+    private void OnDestroy()
+    {
+        if (NonNativeKeyboard.Instance != null)
         {
-            inputField.text = keyboard.text;
-            // Do stuff with keyboardText
+            NonNativeKeyboard.Instance.OnClosed -= UnlinkInputField;
         }
-    }
-
-    public void OpenSystemKeyboard(string initial)
-    {
-        keyboard = TouchScreenKeyboard.Open(initial, TouchScreenKeyboardType.Default);
     }
 
 }
