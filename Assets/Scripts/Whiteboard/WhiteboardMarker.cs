@@ -14,6 +14,8 @@ public class WhiteboardMarker : MonoBehaviour
     private float _tipHeight;
 
     private RaycastHit _touch;
+
+    [SerializeField]
     private Whiteboard _whiteboard;
     private Vector2 _touchPos, _lastTouchPos;
     private bool _touchedLastFrame;
@@ -37,11 +39,6 @@ public class WhiteboardMarker : MonoBehaviour
         {
             if (_touch.transform.CompareTag("Whiteboard"))
             {
-                if (_whiteboard == null)
-                {
-                    _whiteboard = _touch.transform.GetComponent<Whiteboard>();
-                }
-
                 _touchPos = new Vector2(_touch.textureCoord.x, _touch.textureCoord.y);
 
                 var x = (int)(_touchPos.x * _whiteboard.textureSize.x - (_penSize / 2));
@@ -53,10 +50,12 @@ public class WhiteboardMarker : MonoBehaviour
                 {
                     _whiteboard.texture.SetPixels(x, y, _penSize, _penSize, _colors);
 
+
+                    // Linear Interpolation (laggy)
                     for (float f = 0.01f; f < 1.00f; f += 0.05f)
                     {
-                        var lerpX = (int)Mathf.Lerp(_lastTouchPos.x, x, f);
-                        var lerpY = (int)Mathf.Lerp(_lastTouchPos.y, y, f);
+                        var lerpX = (int) Mathf.Lerp(_lastTouchPos.x, x, f);
+                        var lerpY = (int) Mathf.Lerp(_lastTouchPos.y, y, f);
                         _whiteboard.texture.SetPixels(lerpX, lerpY, _penSize, _penSize, _colors);
                     }
 
@@ -72,7 +71,6 @@ public class WhiteboardMarker : MonoBehaviour
             }
         }
 
-        _whiteboard = null;
         _touchedLastFrame = false;
     }
 }
