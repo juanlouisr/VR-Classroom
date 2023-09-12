@@ -163,8 +163,6 @@ namespace UnityEngine.XR.Interaction.Toolkit.Samples.StarterAssets
         {
             m_Teleporting = true;
 
-            Debug.Log("teleporting");
-
             if (m_TeleportInteractor != null)
                 m_TeleportInteractor.gameObject.SetActive(true);
 
@@ -186,7 +184,6 @@ namespace UnityEngine.XR.Interaction.Toolkit.Samples.StarterAssets
                 }
             }
 
-            Debug.Log("Teleport Cancelled/Finished");
             m_Teleporting = false;
 
             // Do not deactivate the teleport interactor in this callback.

@@ -38,4 +38,28 @@ namespace Quiz.Response
         public long questionId;
         public string optionText;
     }
+
+    [Serializable]
+    public class Response
+    {
+        public long userId;
+        public long quizId;
+        public long questionId;
+        public long optionId;
+        public DateTime responseTime;
+        public ResponseStatus status = ResponseStatus.SAVED;
+    }
+
+    [Serializable]
+    public class QuizIdentityResponse
+    {
+        public long userId;
+        public long quizId;
+    }
+
+    public enum ResponseStatus
+    {
+        SAVED,
+        FINAL
+    }
 }
